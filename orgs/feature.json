@@ -1,6 +1,6 @@
 {
   "orgName": "Shulman-Jira-Integration - Feature Test Org",
-  "edition": "Developer",
+  "edition": "Enterprise",
   "settings": {
     "lightningExperienceSettings": {
       "enableS1DesktopEnabled": true
