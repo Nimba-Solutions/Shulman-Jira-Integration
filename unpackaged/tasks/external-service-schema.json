@@ -1,0 +1,315 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "JIRA Bridge - Small Office Integration",
+    "description": "Simplified Atlassian Forge app for bidirectional JIRA-Salesforce sync",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Shulman Law Firm",
+      "email": "admin@shulmanlaw.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://[FORGE_APP_ID].atlassian-dev.net",
+      "description": "Development Forge App"
+    },
+    {
+      "url": "https://[FORGE_APP_ID].atlassian.net",
+      "description": "Production Forge App"
+    }
+  ],
+  "paths": {
+    "/webtrigger/salesforce-handler": {
+      "post": {
+        "summary": "Create JIRA Issue",
+        "description": "Creates a JIRA issue from Salesforce data with small office optimizations",
+        "operationId": "createIssue",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["action", "data"],
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "enum": ["CREATE_ISSUE"],
+                    "description": "Action to perform"
+                  },
+                  "data": {
+                    "type": "object",
+                    "required": ["summary"],
+                    "properties": {
+                      "summary": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "description": "JIRA issue summary (required)"
+                      },
+                      "description": {
+                        "type": "string",
+                        "maxLength": 32767,
+                        "description": "JIRA issue description"
+                      },
+                      "issueType": {
+                        "type": "string",
+                        "default": "Task",
+                        "enum": ["Task", "Bug", "Story", "Epic"],
+                        "description": "JIRA issue type"
+                      },
+                      "recordId": {
+                        "type": "string",
+                        "pattern": "^[a-zA-Z0-9]{15,18}$",
+                        "description": "Source Salesforce record ID"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "action": "CREATE_ISSUE",
+                "data": {
+                  "summary": "Client contract review needed",
+                  "description": "Urgent review required for new client agreement. See attached documents.",
+                  "issueType": "Task",
+                  "recordId": "001XX000003DHP0"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "JIRA issue created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["success"],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "True if issue was created successfully"
+                    },
+                    "issueKey": {
+                      "type": "string",
+                      "pattern": "^[A-Z]+-\\d+$",
+                      "description": "JIRA issue key (e.g., SH-123)",
+                      "example": "SH-123"
+                    },
+                    "issueUrl": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "Direct link to the JIRA issue",
+                      "example": "https://shulman-hill.atlassian.net/browse/SH-123"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "issueKey": "SH-123",
+                  "issueUrl": "https://shulman-hill.atlassian.net/browse/SH-123"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "string",
+                      "description": "Error message describing what went wrong"
+                    }
+                  }
+                },
+                "example": {
+                  "success": false,
+                  "error": "Summary is required"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "string",
+                      "description": "Internal error message"
+                    }
+                  }
+                },
+                "example": {
+                  "success": false,
+                  "error": "Configuration not found"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Integration"]
+      }
+    },
+    "/webtrigger/config-handler": {
+      "get": {
+        "summary": "Get Configuration",
+        "description": "Retrieve current Forge app configuration",
+        "operationId": "getConfig",
+        "responses": {
+          "200": {
+            "description": "Configuration retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "instanceUrl": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "Salesforce instance URL"
+                    },
+                    "clientId": {
+                      "type": "string",
+                      "description": "Connected App Consumer Key (masked)"
+                    },
+                    "jiraProjectKey": {
+                      "type": "string",
+                      "description": "JIRA project key"
+                    },
+                    "jiraInstanceUrl": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "JIRA instance URL"
+                    },
+                    "configured": {
+                      "type": "boolean",
+                      "description": "True if app is fully configured"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Configuration"]
+      },
+      "post": {
+        "summary": "Update Configuration",
+        "description": "Configure Salesforce connection and JIRA settings",
+        "operationId": "updateConfig",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["instanceUrl", "clientId", "clientSecret"],
+                "properties": {
+                  "instanceUrl": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "Salesforce instance URL",
+                    "example": "https://shulman-hill--uat.my.salesforce.com"
+                  },
+                  "clientId": {
+                    "type": "string",
+                    "description": "Connected App Consumer Key"
+                  },
+                  "clientSecret": {
+                    "type": "string",
+                    "description": "Connected App Consumer Secret"
+                  },
+                  "jiraProjectKey": {
+                    "type": "string",
+                    "default": "SH",
+                    "description": "JIRA project key for issue creation"
+                  },
+                  "jiraInstanceUrl": {
+                    "type": "string",
+                    "format": "uri",
+                    "default": "https://shulman-hill.atlassian.net",
+                    "description": "JIRA instance URL"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Configuration updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid configuration data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "string",
+                      "description": "Validation error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Configuration"]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Integration",
+      "description": "JIRA integration operations"
+    },
+    {
+      "name": "Configuration",
+      "description": "App configuration management"
+    }
+  ]
+}

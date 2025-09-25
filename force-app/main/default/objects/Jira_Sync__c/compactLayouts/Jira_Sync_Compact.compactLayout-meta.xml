@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Jira_Sync_Compact</fullName>
+    <fields>External_Issue_Key__c</fields>
+    <fields>Status__c</fields>
+    <fields>Sync_Status__c</fields>
+    <fields>Last_Sync_Date__c</fields>
+    <label>JIRA Sync Compact Layout</label>
+</CompactLayout>

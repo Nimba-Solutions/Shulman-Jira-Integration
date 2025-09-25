@@ -1,0 +1,34 @@
+schema-version: '1'
+id: 'ari:cloud:ecosystem::app/salesforce-jira-bridge'
+name: 'Salesforce Bridge'
+description: 'Simple bidirectional sync for small office'
+
+modules:
+  # HTTP endpoint for Salesforce calls
+  web-trigger:
+    - key: 'salesforce-handler'
+      function: 'handleSalesforceRequest'
+    - key: 'config-handler'
+      function: 'configEndpoints'
+      
+  # Single function for Jira events  
+  jira:issueUpdated:
+    - key: 'jira-handler'
+      function: 'handleJiraUpdate'
+
+app:
+  # Only what we need
+  external:
+    fetch:
+      backend:
+        - '*.salesforce.com'
+        
+  # Minimal permissions
+  scopes:
+    - 'read:jira-work'
+    - 'write:jira-work'
+
+# Simple storage
+storage:
+  encrypted:
+    - 'salesforce-config'

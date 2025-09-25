@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cci org:*)",
+      "Bash(cci task run:*)",
+      "Bash(sf project deploy:*)",
+      "Bash(sf org list:*)",
+      "Bash(sf org display:*)",
+      "Bash(sf config set:*)",
+      "Bash(touch:*)",
+      "Bash(mv:*)",
+      "Bash(cd:*)",
+      "Bash(cp:*)",
+      "Bash(mkdir:*)",
+      "Bash(sf apex run:*)",
+      "Bash(sf apex run test:*)",
+      "Bash(sf apex get test:*)",
+      "Bash(sf apex get log:*)",
+      "Bash(sf data query:*)",
+      "Bash(sf data create record:*)",
+      "Bash(sf sobject describe:*)",
+      "WebSearch",
+      "WebFetch(domain:trailhead.salesforce.com)",
+      "WebFetch(domain:developer.atlassian.com)",
+      "WebFetch(domain:help.salesforce.com)",
+      "WebFetch(domain:support.atlassian.com)",
+      "Bash(curl:*)",
+      "Bash(echo:*)",
+      "Bash(robot:*)",
+      "ReadFile:*"
+    ],
+    "deny": [],
+    "ask": [
+      "Bash(rm:*)"
+    ]
+  }
+}

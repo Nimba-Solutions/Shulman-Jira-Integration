@@ -1,0 +1,19 @@
+{
+  "name": "salesforce-jira-bridge",
+  "version": "1.0.0",
+  "description": "Simple bidirectional sync for Shulman small office",
+  "author": "Shulman Law Firm",
+  "license": "MIT",
+  "main": "src/index.js",
+  "scripts": {
+    "deploy": "forge deploy",
+    "install": "forge install",
+    "logs": "forge logs --follow"
+  },
+  "dependencies": {
+    "@forge/api": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
